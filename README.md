@@ -6,18 +6,26 @@ au clic et expose trois onglets : **Favoris**, **Récents**, **Recherche**.
 
 > ⚠️ **Note importante sur cette livraison**
 >
-> Le code a été écrit dans un environnement Linux où ni Swift, ni les frameworks
-> Apple (AppKit/SwiftUI/Carbon/SMAppService), ni `screencapture` ne sont
-> disponibles. La compilation **n'a donc pas été vérifiée** ; le projet est
-> conçu pour compiler tel quel sur un Mac (Xcode 15+ / Swift 5.9+, macOS 13+),
-> mais des ajustements mineurs peuvent être nécessaires au premier `swift build`.
-> Il n'y a pas de capture d'écran fournie pour la même raison.
+> Le code a été écrit dans un environnement Linux. Ce que j'ai pu vérifier
+> en local (Swift 5.10.1 sur Ubuntu 24.04) :
+>
+> - `swift package resolve` réussit, KeyboardShortcuts 2.0.2 est résolu
+>   (committé dans `Package.resolved`).
+> - `swiftc -parse` passe sur les 17 fichiers Swift (zéro erreur de syntaxe).
+> - L'API de KeyboardShortcuts 2.0.2 a été vérifiée à la main contre le code
+>   (Recorder, onKeyDown, Name init, Key.space).
+>
+> Ce qui ne peut **pas** être vérifié hors macOS : le typecheck contre
+> AppKit/SwiftUI/Carbon/SMAppService/Spotlight. La CI macOS définie dans
+> `.github/workflows/build.yml` (runner `macos-14`, Xcode 15.4 ou fallback)
+> couvre ce trou et lance `swift build -c release` à chaque push.
+> Pas de capture d'écran fournie : `screencapture` est macOS-only.
 
 ## Pré-requis
 
 - macOS 13 Ventura ou plus récent
-- Xcode 15 (ou les Command Line Tools) → fournit Swift 5.9+
-- Réseau pour résoudre la dépendance `KeyboardShortcuts`
+- Xcode 15.3+ (Swift **5.10** minimum, requis par KeyboardShortcuts 2.0.2)
+- Réseau pour résoudre la dépendance `KeyboardShortcuts` (au premier build)
 
 ## Build & lancement
 
@@ -106,6 +114,9 @@ Sources/QuickFinder/
 
 ## Limitations connues
 
-- Première compilation susceptible de réclamer `Package.resolved` (`swift package resolve`).
-- Le toggle "Lancer au démarrage" requiert l'app installée + signée.
-- Les hover/animations utilisent `withAnimation(.smooth)` — ok macOS 13+.
+- `Package.resolved` est versionné, donc le premier build est reproductible.
+- Le toggle "Lancer au démarrage" requiert l'app installée dans `/Applications`
+  et signée (sinon `SMAppService.mainApp.status` reste `.notFound` et le
+  toggle log une erreur — c'est attendu en `swift run`).
+- Les animations utilisent `withAnimation(.easeInOut(duration:))` plutôt que
+  `.smooth` (macOS 14+).

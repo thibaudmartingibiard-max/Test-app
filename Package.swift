@@ -1,4 +1,4 @@
-// swift-tools-version: 5.9
+// swift-tools-version: 5.10
 // QuickFinder — app barre de menu macOS
 import PackageDescription
 

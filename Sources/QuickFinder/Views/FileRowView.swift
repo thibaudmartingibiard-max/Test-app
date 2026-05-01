@@ -46,7 +46,7 @@ struct FileRowView: View {
                 .fill(Color(nsColor: .controlAccentColor).opacity(isHovering ? 0.15 : 0))
         )
         .onHover { hovering in
-            withAnimation(.smooth(duration: 0.12)) { isHovering = hovering }
+            withAnimation(.easeInOut(duration: 0.12)) { isHovering = hovering }
         }
         .contentShape(Rectangle())
     }

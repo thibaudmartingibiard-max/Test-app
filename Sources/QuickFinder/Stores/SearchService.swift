@@ -84,7 +84,10 @@ final class SearchService: ObservableObject {
                 var copy = item
                 return copy.resolveURL()
             }
-            return urls.isEmpty ? [NSMetadataQueryUserHomeScope] : urls
+            if urls.isEmpty {
+                return [NSMetadataQueryUserHomeScope]
+            }
+            return urls
         }
         return [NSMetadataQueryUserHomeScope]
     }

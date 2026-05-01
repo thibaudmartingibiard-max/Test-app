@@ -66,14 +66,22 @@ final class FavoritesStore: ObservableObject {
 
     // MARK: - Résolution & accès filesystem
 
-    /// Résout le favori vers son URL réelle (en mettant à jour le bookmark si stale).
+    /// Résout le favori vers son URL réelle. Si le bookmark est stale, on
+    /// programme la mise à jour pour le prochain runloop afin de ne pas muter
+    /// `@Published items` pendant un cycle de rendu SwiftUI.
     func url(for item: FavoriteItem) -> URL? {
         guard let idx = items.firstIndex(where: { $0.id == item.id }) else { return nil }
         var copy = items[idx]
         let url = copy.resolveURL()
         if copy.bookmarkData != items[idx].bookmarkData {
-            items[idx] = copy
-            save()
+            let refreshed = copy
+            DispatchQueue.main.async { [weak self] in
+                guard let self,
+                      let i = self.items.firstIndex(where: { $0.id == refreshed.id })
+                else { return }
+                self.items[i] = refreshed
+                self.save()
+            }
         }
         return url
     }

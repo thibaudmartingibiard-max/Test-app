@@ -52,7 +52,7 @@ struct FavoritesView: View {
         HStack(spacing: 6) {
             if !navigationStack.isEmpty {
                 Button {
-                    withAnimation(.smooth) { _ = navigationStack.popLast() }
+                    withAnimation(.easeInOut(duration: 0.2)) { _ = navigationStack.popLast() }
                 } label: {
                     Image(systemName: "chevron.left")
                 }
@@ -118,7 +118,7 @@ struct FavoritesView: View {
                     NSWorkspace.shared.activateFileViewerSelecting([url])
                     onRequestClose()
                 } else {
-                    withAnimation(.smooth) { navigationStack.append(url) }
+                    withAnimation(.easeInOut(duration: 0.2)) { navigationStack.append(url) }
                 }
             }
             .contextMenu {
@@ -168,7 +168,7 @@ struct FavoritesView: View {
                 NSWorkspace.shared.activateFileViewerSelecting([entry.url])
                 onRequestClose()
             } else {
-                withAnimation(.smooth) { navigationStack.append(entry.url) }
+                withAnimation(.easeInOut(duration: 0.2)) { navigationStack.append(entry.url) }
             }
         } else {
             NSWorkspace.shared.open(entry.url)

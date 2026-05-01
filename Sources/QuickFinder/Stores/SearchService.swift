@@ -5,7 +5,8 @@ import Foundation
 import AppKit
 import Combine
 
-@MainActor
+/// NSMetadataQuery est piloté sur le main thread (set up + start + delegate).
+/// Pas de @MainActor pour pouvoir être instancié depuis SearchView.init.
 final class SearchService: ObservableObject {
     @Published var query: String = ""
     @Published var scopeToFavorites: Bool = false

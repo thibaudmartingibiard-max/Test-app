@@ -9,7 +9,9 @@ import Foundation
 import AppKit
 import Combine
 
-@MainActor
+/// Toutes les méthodes sont conçues pour être appelées depuis le main thread
+/// (vues SwiftUI, AppDelegate). On évite l'annotation @MainActor pour
+/// préserver la souplesse d'appel depuis les closures AppKit non isolées.
 final class FavoritesStore: ObservableObject {
     @Published private(set) var items: [FavoriteItem] = []
 

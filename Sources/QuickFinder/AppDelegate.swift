@@ -24,8 +24,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         )
 
         // 2) Branche le raccourci global Cmd+Shift+Space sur l'ouverture du popover.
+        // KeyboardShortcuts appelle déjà le callback sur le main thread, mais
+        // on l'enrobe d'un Task @MainActor pour satisfaire l'isolation Swift.
         KeyboardShortcuts.onKeyDown(for: .toggleQuickFinder) { [weak self] in
-            self?.menuBarController?.togglePopover()
+            Task { @MainActor in
+                self?.menuBarController?.togglePopover()
+            }
         }
 
         // 3) Première lecture des récents.

@@ -7,7 +7,8 @@ import Foundation
 import AppKit
 import Combine
 
-@MainActor
+/// Appelé depuis le main thread (vues SwiftUI, AppDelegate). Pas de
+/// @MainActor pour rester compatible avec les closures non isolées.
 final class RecentsStore: ObservableObject {
     @Published private(set) var entries: [FileEntry] = []
 

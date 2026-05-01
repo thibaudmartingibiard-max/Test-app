@@ -116,9 +116,9 @@ final class MenuBarController: NSObject, NSPopoverDelegate {
             matching: [.leftMouseDown, .rightMouseDown]
         ) { [weak self] _ in
             // Le callback est appelé sur le main thread par AppKit, mais on
-            // hop quand même explicitement pour que Swift Concurrency soit
-            // satisfait (MenuBarController est @MainActor).
-            DispatchQueue.main.async { self?.closePopover() }
+            // hop explicitement pour satisfaire l'isolation Swift Concurrency
+            // (MenuBarController est @MainActor).
+            Task { @MainActor in self?.closePopover() }
         }
     }
 

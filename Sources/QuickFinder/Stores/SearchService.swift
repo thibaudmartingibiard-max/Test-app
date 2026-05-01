@@ -6,8 +6,9 @@ import AppKit
 import Combine
 
 /// NSMetadataQuery est piloté sur le main thread (set up + start + delegate).
-/// Pas de @MainActor pour pouvoir être instancié depuis SearchView.init.
-final class SearchService: ObservableObject {
+/// Hérite de NSObject pour que NotificationCenter puisse dispatcher les
+/// callbacks via selector Obj-C (#selector requires un objc-compatible self).
+final class SearchService: NSObject, ObservableObject {
     @Published var query: String = ""
     @Published var scopeToFavorites: Bool = false
     @Published private(set) var results: [FileEntry] = []
@@ -18,6 +19,7 @@ final class SearchService: ObservableObject {
 
     init(favoritesStore: FavoritesStore? = nil) {
         self.favoritesStore = favoritesStore
+        super.init()
         setupBindings()
         setupNotifications()
     }

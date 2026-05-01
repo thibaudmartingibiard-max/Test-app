@@ -10,11 +10,24 @@ jobs:
   swift-build:
     name: swift build (macOS)
     runs-on: macos-14
-    timeout-minutes: 20
+    timeout-minutes: 25
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Select a Swift 5.10+ Xcode
+        # On a besoin de Swift 5.10 minimum (notre swift-tools-version + dep).
+        # On essaye 15.4 puis 15.3 ; fallback sur l'Xcode par défaut du runner.
+        run: |
+          if [ -d /Applications/Xcode_15.4.app ]; then
+            sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
+          elif [ -d /Applications/Xcode_15.3.app ]; then
+            sudo xcode-select -s /Applications/Xcode_15.3.app/Contents/Developer
+          else
+            echo "Aucun Xcode 15.3+ trouvé, on utilise l'Xcode par défaut du runner."
+            ls /Applications | grep -i Xcode || true
+          fi
 
       - name: Show toolchain
         run: |
@@ -26,7 +39,16 @@ jobs:
         run: swift package resolve
 
       - name: Build (debug)
-        run: swift build
+        run: swift build -v 2>&1 | tee build-debug.log
 
       - name: Build (release)
-        run: swift build -c release
+        run: swift build -c release -v 2>&1 | tee build-release.log
+
+      - name: Upload build logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs
+          path: |
+            build-debug.log
+            build-release.log

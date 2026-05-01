@@ -22,7 +22,9 @@ final class SearchService: ObservableObject {
     }
 
     deinit {
-        metadataQuery.stop()
+        // NotificationCenter.removeObserver est thread-safe ; on évite de
+        // toucher metadataQuery ici car NSMetadataQuery.stop() exige le main
+        // thread et la deinit n'est pas garantie d'y être exécutée.
         NotificationCenter.default.removeObserver(self)
     }
 

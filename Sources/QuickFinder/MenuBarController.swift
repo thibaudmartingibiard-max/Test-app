@@ -5,6 +5,7 @@
 import AppKit
 import SwiftUI
 
+@MainActor
 final class MenuBarController: NSObject, NSPopoverDelegate {
     private let statusItem: NSStatusItem
     private let popover: NSPopover
@@ -114,7 +115,10 @@ final class MenuBarController: NSObject, NSPopoverDelegate {
         globalClickMonitor = NSEvent.addGlobalMonitorForEvents(
             matching: [.leftMouseDown, .rightMouseDown]
         ) { [weak self] _ in
-            self?.closePopover()
+            // Le callback est appelé sur le main thread par AppKit, mais on
+            // hop quand même explicitement pour que Swift Concurrency soit
+            // satisfait (MenuBarController est @MainActor).
+            DispatchQueue.main.async { self?.closePopover() }
         }
     }
 

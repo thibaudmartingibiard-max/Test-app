@@ -13,6 +13,9 @@ struct FavoritesView: View {
 
     /// Pile d'URLs visitées pour le drill-in. Vide => on est à la racine.
     @State private var navigationStack: [URL] = []
+    /// Cache du listing du dossier courant (évite de relire le disque à
+    /// chaque re-render de la vue).
+    @State private var currentChildren: [FileEntry] = []
     @State private var renameTarget: FavoriteItem?
     @State private var renameDraft: String = ""
 
@@ -28,6 +31,19 @@ struct FavoritesView: View {
         .sheet(item: $renameTarget) { item in
             renameSheet(for: item)
         }
+        .onChange(of: navigationStack) { _ in
+            reloadCurrentChildren()
+        }
+    }
+
+    /// Recharge `currentChildren` depuis le disque pour le dossier au sommet
+    /// de la pile (no-op si on est à la racine).
+    private func reloadCurrentChildren() {
+        guard let url = navigationStack.last else {
+            currentChildren = []
+            return
+        }
+        currentChildren = store.listChildren(of: url)
     }
 
     // MARK: - Header (titre + breadcrumb + bouton +)
@@ -127,15 +143,12 @@ struct FavoritesView: View {
 
     @ViewBuilder
     private var drillList: some View {
-        let current = navigationStack.last!
-        let children = store.listChildren(of: current)
-
-        if children.isEmpty {
+        if currentChildren.isEmpty {
             placeholder("Dossier vide.")
         } else {
             ScrollView {
                 LazyVStack(spacing: 2) {
-                    ForEach(children) { entry in
+                    ForEach(currentChildren) { entry in
                         FileRowView(
                             entry: entry,
                             trailingText: entry.isDirectory ? nil : RelativeDateFormatter.string(

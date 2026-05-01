@@ -5,6 +5,7 @@ import AppKit
 import SwiftUI
 import KeyboardShortcuts
 
+@MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     // Stores partagés à l'échelle de l'app (injectés dans les vues SwiftUI).
     let favoritesStore = FavoritesStore()

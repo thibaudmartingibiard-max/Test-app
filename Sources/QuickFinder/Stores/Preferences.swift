@@ -4,7 +4,8 @@
 import Foundation
 import Combine
 
-@MainActor
+/// Préférences globales. Pas d'annotation @MainActor : UserDefaults est
+/// thread-safe et @Published fait son hop vers le main pour les notifs.
 final class Preferences: ObservableObject {
     static let shared = Preferences()
 
